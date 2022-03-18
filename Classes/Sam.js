@@ -1,3 +1,9 @@
+var normalJumpSpeed = -600;
+var normalHorazontalAcc = 1500;
+var gravity = 1500;
+var slowConst = 1000;
+var slowVScale = .5;
+
 class Sam{
 
 	constructor(x, y) {
@@ -5,34 +11,66 @@ class Sam{
 		this.y = y;
 		this.w = 20;
 		this.h = 40;
-		this.vel = new velocity();
+		this.vel = new Velocity();
+		this.acc = new Acceleration();
 		this.level = [];
+		this.lastUpdate = new Date().getTime();
+		this.numFramesInFreeFall = 0;
+		this.prevV = 0;
 	}
 
 	draw(){
-		fill(color(255,200,200));
+		if(Math.abs(this.prevV-this.vel.vx) < 3){
+			fill(color(0,200,0));
+		}else{
+			fill(color(255,200,200));
+		}
 		rect(this.x, this.y, this.w, this.h);
 	}
 
 	updatePos(){
-		var newX = this.x + this.vel.vx;
-		var newY = this.y + this.vel.vy;
+		var curTime = new Date().getTime();
+		var changeInTime = (curTime - this.lastUpdate)/1000;
+		this.lastUpdate = curTime;
+
+		var newX = this.x + this.vel.vx*changeInTime;
+		var newY = this.y + this.vel.vy*changeInTime;
+
+		this.accelerate(changeInTime);
+		//which boxes it clips into
 		var clips = this.findClips(newX, newY);
+		var preJ = this.canJump;
+		//it did not hit any boxes
 		if(clips.length == 0){
 			this.y = newY;
 			this.x = newX;
+			//prevent overflow
+			if(this.numFramesInFreeFall<500){
+				this.numFramesInFreeFall++;
+			}
+		//it hit a box
 		}else{
+			//check if it hit verticaly or horazontaly and stop it from moving in that direction
 			var whereClip = this.findSideOfClip(clips);
+			//it did not hit verticaly
 			if(!whereClip[1]){
 				this.y = newY;
+			}else{
+				this.handleHitVertical();
+				//sam can jump bc they are on the ground or on a cieling(can jump off cielings)
+				this.numFramesInFreeFall = 0;
 			}
+			//it did not hit horazontaly
 			if(!whereClip[0]){
 				this.x = newX;
+			}else{
+				this.handleHitHorazontaly();
 			}
 		}
 
 	}
 
+	//find the boxes it hits
 	findClips(nx, ny){
 		var clips = [];
 		for(let i = 0; i < this.level.length; i++){
@@ -43,6 +81,7 @@ class Sam{
 		return clips;
 	}
 
+	//find where it hit(verticaly or horazontaly)
 	findSideOfClip(clips){
 		var horBlocked = false;
 		var vertBlocked = false;
@@ -59,13 +98,65 @@ class Sam{
 		return ret;
 	}
 
+	//it hit something verticaly
+	handleHitVertical(){
+		this.vel.vy = 5;
+	}
+
+	//it hit something verticaly
+	handleHitHorazontaly(){
+		this.vel.vx = 5;
+	}
+
+	accelerate(changeInTime){
+		this.acc.updateAx(this.vel);
+		this.prevV = this.vel.vx;
+		this.vel.vy += gravity*changeInTime;
+		this.vel.vx += this.acc.ax*changeInTime;
+		if(Math.abs(this.vel.vx) < 5){
+			this.vel.vx = 0;
+		}
+		if(Math.abs(this.vel.vy) < 5){
+			this.vel.vy = 0;
+		}
+	}
+
+	jump(){
+		if(this.numFramesInFreeFall<5){
+			console.log("can");
+			this.vel.vy = normalJumpSpeed;
+			this.numFramesInFreeFall = 100;
+		}
+	}
+
+	moveLeft(){
+		this.acc.ax = -normalHorazontalAcc;
+	}
+
+	moveRight(){
+		this.acc.ax = normalHorazontalAcc;
+	}
+
 }
 
-class velocity{
+class Velocity{
 	constructor(){
 		this.vx = 1;
-		this.vy = 2;
+		this.vy = -4;
 	}
+}
+
+class Acceleration{
+	constructor(){
+		this.ax = 0;
+		this.ay = 0;
+	}
+
+	updateAx(vel){
+
+		this.ax -= vel.vx*slowVScale + Math.sign(vel.vx)*slowConst;
+	}
+
 }
 
 //checks if the rectangles intersect, r = a 2*2 array
