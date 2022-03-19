@@ -1,8 +1,14 @@
 var normalJumpSpeed = -600;
-var normalHorazontalAcc = 1500;
 var gravity = 1500;
-var slowConst = 1000;
-var slowVScale = .5;
+
+var groundHorazontalAcc = 1500;
+var groundSlowConst = 1000;
+var groundSlowVScale = .5;
+
+var airHorazontalAcc = 150;
+var airSlowConst = 0;
+var airSlowVScale = .1;
+
 
 class Sam{
 
@@ -17,7 +23,7 @@ class Sam{
 		this.lastUpdate = new Date().getTime();
 		this.numFramesInFreeFall = 0;
 		this.canJump = false;
-		this.prevV = 0;
+		this.prevV = 0;//debugging
 	}
 
 	draw(){
@@ -46,10 +52,6 @@ class Sam{
 		this.x = newX;
 
 		this.canJump = false;
-		//prevent overflow
-		if(this.numFramesInFreeFall<500){
-			this.numFramesInFreeFall++;
-		}
 
 		//it may have hit a box so handle that
 		if(clips.length != 0){
@@ -124,20 +126,21 @@ class Sam{
 	}
 
 	accelerate(changeInTime){
-		this.acc.updateAx(this.vel);
-		this.prevV = this.vel.vx;
+		var prevAccX = this.acc.ax;
+		var prevVelX = this.vel.vx;
+		this.acc.updateAx(this.vel, this.canJump);
+		this.prevV = this.vel.vx;//debugging
 		this.vel.vy += gravity*changeInTime;
 		this.vel.vx += this.acc.ax*changeInTime;
-		if(Math.abs(this.vel.vx) < 5){
+
+		//if A or D is not being pressed(only friction is acting on sam), and the velocity changes sign, 
+		//set it to 0, bc it will ocilate back and forth otherwise
+		if(prevAccX == 0 && Math.sign(prevVelX) != Math.sign(this.vel.vx)){
 			this.vel.vx = 0;
-		}
-		if(Math.abs(this.vel.vy) < 5){
-			this.vel.vy = 0;
 		}
 	}
 
 	jump(){
-		//if(this.numFramesInFreeFall<5){
 		if(this.canJump){
 			this.vel.vy = normalJumpSpeed;
 			this.numFramesInFreeFall = 100;
@@ -146,11 +149,19 @@ class Sam{
 	}
 
 	moveLeft(){
-		this.acc.ax = -normalHorazontalAcc;
+		if(this.canJump){
+			this.acc.ax = -groundHorazontalAcc;
+		}else{
+			this.acc.ax = -airHorazontalAcc;
+		}
 	}
 
 	moveRight(){
-		this.acc.ax = normalHorazontalAcc;
+		if(this.canJump){
+			this.acc.ax = groundHorazontalAcc;
+		}else{
+			this.acc.ax = airHorazontalAcc;
+		}
 	}
 
 }
@@ -168,9 +179,12 @@ class Acceleration{
 		this.ay = 0;
 	}
 
-	updateAx(vel){
-
-		this.ax -= vel.vx*slowVScale + Math.sign(vel.vx)*slowConst;
+	updateAx(vel, canJump){
+		if(canJump){
+			this.ax -= vel.vx*groundSlowVScale + Math.sign(vel.vx)*groundSlowConst;
+		}else{
+			this.ax -= vel.vx*airSlowVScale + Math.sign(vel.vx)*airSlowConst;
+		}
 	}
 
 }

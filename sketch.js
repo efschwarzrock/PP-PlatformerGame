@@ -5,6 +5,8 @@ var sam;
 //only jump once
 var oneJump = true;
 
+var efsVar = 0;
+
 //setInterval(setTime, 100);
 var timer = 0;
 
@@ -21,7 +23,7 @@ function setup() {
 }
 
 function draw() {
-	
+	//console.log(sam.canJump);
     fill(color(255,255,255));
 	rect(0,0,bgW,bgH);
 	drawArr(level);
@@ -50,9 +52,8 @@ function userInput(){
 	}
 	
 	if(keyIsDown(87) && !oneJump){
-		console.log("here");
 		sam.jump();
-		oneJump = true;
+		//oneJump = true;
 	}else if(!keyIsDown(87)){
 		oneJump = false;
 	}
