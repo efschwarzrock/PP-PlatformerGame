@@ -1,4 +1,4 @@
-var hitboxBorder = 5
+var hitboxBorder = 20
 
 class Platform{
 
@@ -21,11 +21,11 @@ class Platform{
 		if(this.x < x + w && this.x + this.w > x){
 			//check if it's within the hitbox border
 			//check if it's ontop
-			if(y + h > this.y - hitboxBorder && y + h < this.y + hitboxBorder*3){
+			if(y + h >= this.y && y + h < this.y + hitboxBorder){
 				return ["T", this.y-h]
 			}
 			//check if it hit the bottom
-			if(y > this.y + this.h - hitboxBorder*3 && y < this.y + this.h + hitboxBorder){
+			if(y > this.y + this.h - hitboxBorder && y < this.y + this.h){
 				return ["B", this.y+this.h]
 			}
 		}
@@ -34,11 +34,11 @@ class Platform{
 		if(this.y < y + h && this.y + this.h > y){
 			//check if it's within the hitbox border
 			//check if it's on the left
-			if(x + w > this.x - hitboxBorder && x + w < this.x + hitboxBorder*3){
+			if(x + w > this.x && x + w < this.x + hitboxBorder){
 				return ["L", this.x-w]
 			}
 			//check if it hit the right
-			if(x > this.x + this.w - hitboxBorder*3 && x < this.x + this.w + hitboxBorder){
+			if(x > this.x + this.w - hitboxBorder && x < this.x + this.w){
 				return ["R", this.x+this.w]
 			}
 		}
