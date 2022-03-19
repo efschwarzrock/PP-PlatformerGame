@@ -6,12 +6,11 @@ function createLevel() {
 	//small
 	level.push(new Platform(240,375,30,10));
 
-	//lower
+	//lower platform
 	level.push(new Platform(800,300,150,30));
-	//upper
-	level.push(new Platform(1300,200,150,30));
-	//stop
-	level.push(new Platform(1450,150,30,90));
+	//upper platform
+	level.push(new Platform(1400,200,150,30));
+
 	//botom
 	level.push(new Platform(0,400,1500,90));
 
