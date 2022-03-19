@@ -5,6 +5,7 @@ class Platform{
 	constructor(x, y, w, h) {
 		this.x = x;
 		this.y = y;
+		//make it atleast 10
 		this.w = w;
 		this.h = h;
 	}
@@ -22,11 +23,11 @@ class Platform{
 			//check if it's within the hitbox border
 			//check if it's ontop
 			if(y + h >= this.y && y + h < this.y + hitboxBorder){
-				return ["T", this.y-h]
+				return ["T", this.y-h];
 			}
 			//check if it hit the bottom
 			if(y > this.y + this.h - hitboxBorder && y < this.y + this.h){
-				return ["B", this.y+this.h]
+				return ["B", this.y+this.h];
 			}
 		}
 		//it is not above or below it
@@ -35,12 +36,12 @@ class Platform{
 			//check if it's within the hitbox border
 			//check if it's on the left
 			if(x + w > this.x && x + w < this.x + hitboxBorder){
-				console.log(efsVar- new Date().getTime(), "efsVar");
-				return ["L", this.x-w]
+				console.log("right");
+				return ["L", this.x-w];
 			}
 			//check if it hit the right
 			if(x > this.x + this.w - hitboxBorder && x < this.x + this.w){
-				return ["R", this.x+this.w]
+				return ["R", this.x+this.w];
 			}
 		}
 		return 0;

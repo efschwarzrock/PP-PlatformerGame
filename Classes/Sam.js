@@ -1,6 +1,7 @@
 var normalJumpSpeed = -600;
 var gravity = 1500;
 
+//var groundHorazontalAcc = 1500;
 var groundHorazontalAcc = 1500;
 var groundSlowConst = 1000;
 var groundSlowVScale = .5;

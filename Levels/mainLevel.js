@@ -15,8 +15,8 @@ function createLevel() {
 	level.push(new Platform(0,400,1500,90));
 
 	//left
-	level.push(new Platform(0,0,10,bgH));
+	level.push(new Platform(0,0,20,bgH));
 
 	//right
-	level.push(new Platform(bgW-10,0,10,bgH));
+	level.push(new Platform(bgW-10,0,20,bgH));
 }
