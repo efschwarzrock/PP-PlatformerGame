@@ -37,7 +37,7 @@ function drawArr(arr){
 	});
 }
 
-//get and handel the user input
+//get and handle the user input
 function userInput(){
 	//A key
 	if(keyIsDown(65)){

@@ -16,6 +16,7 @@ class Sam{
 		this.level = [];
 		this.lastUpdate = new Date().getTime();
 		this.numFramesInFreeFall = 0;
+		this.canJump = false;
 		this.prevV = 0;
 	}
 
@@ -39,33 +40,20 @@ class Sam{
 		this.accelerate(changeInTime);
 		//which boxes it clips into
 		var clips = this.findClips(newX, newY);
-		var preJ = this.canJump;
-		//it did not hit any boxes
-		if(clips.length == 0){
-			this.y = newY;
-			this.x = newX;
-			//prevent overflow
-			if(this.numFramesInFreeFall<500){
-				this.numFramesInFreeFall++;
-			}
-		//it hit a box
-		}else{
-			//check if it hit verticaly or horazontaly and stop it from moving in that direction
-			var whereClip = this.findSideOfClip(clips);
-			//it did not hit verticaly
-			if(!whereClip[1]){
-				this.y = newY;
-			}else{
-				this.handleHitVertical();
-				//sam can jump bc they are on the ground or on a cieling(can jump off cielings)
-				this.numFramesInFreeFall = 0;
-			}
-			//it did not hit horazontaly
-			if(!whereClip[0]){
-				this.x = newX;
-			}else{
-				this.handleHitHorazontaly();
-			}
+
+		//assume it did not hit anything, and we will check and fix the assumtion later
+		this.y = newY;
+		this.x = newX;
+
+		this.canJump = false;
+		//prevent overflow
+		if(this.numFramesInFreeFall<500){
+			this.numFramesInFreeFall++;
+		}
+
+		//it may have hit a box so handle that
+		if(clips.length != 0){
+			this.handleHit(clips, newX, newY);
 		}
 
 	}
@@ -74,38 +62,65 @@ class Sam{
 	findClips(nx, ny){
 		var clips = [];
 		for(let i = 0; i < this.level.length; i++){
-    			if(rectsIntersect([[nx, ny],[nx+this.w, ny+this.h]], [[this.level[i].x,this.level[i].y],[this.level[i].x+this.level[i].w,this.level[i].y+this.level[i].h]]) == 0){
-				clips.push(i);
+			var clip = this.level[i].isInHitbox(nx, ny, this.w, this.h);
+    		if(clip != 0){
+				clips.push(clip);
 			}
 		}
 		return clips;
 	}
 
-	//find where it hit(verticaly or horazontaly)
-	findSideOfClip(clips){
-		var horBlocked = false;
-		var vertBlocked = false;
+	//it hit something so handle it
+	handleHit(clips, nx, ny){
 		for(let i = 0; i < clips.length; i++){
-			var pos = rectsIntersect([[this.x, this.y],[this.x+this.w, this.y+this.h]], [[this.level[clips[i]].x, this.level[clips[i]].y],[this.level[clips[i]].x+this.level[clips[i]].w, this.level[clips[i]].y+this.level[clips[i]].h]])
-			if(pos/10 > .5){
-				horBlocked = true;
-			}
-			if(pos%10 == 1){
-				vertBlocked = true;
+			var clip = clips[i];
+			//on the top of a platform
+			if(clip[0] == "T"){
+				//it was traveling downward so stop it
+				if(this.vel.vy > 0){
+					this.vel.vy = 0
+					this.acc.ay = 0
+					this.canJump = true;
+					//place Sam where they are supposed to go
+					this.y = clip[1];
+				}
+				//else it was traveling upward so don't do anything
+				
+
+				//on the bottom of a platform
+			}else if(clip[0] == "B"){
+				//it was traveling upward so stop it
+				if(this.vel.vy < 0){
+					this.vel.vy = 0
+					this.acc.ay = 0
+					//place Sam where they are supposed to go
+					this.y = clip[1];
+				}
+				//else it was traveling downward so don't do anything
+
+				//on the left side of a platform
+			}else if(clip[0] == "L"){
+				//it was traveling right so stop it
+				if(this.vel.vx > 0){
+					this.vel.vx = 0
+					this.acc.ax = 0
+					//place Sam where they are supposed to go
+					this.x = clip[1];
+				}
+				//else it was traveling left so don't do anything
+
+				//on the right side of the platform
+			}else if(clip[0] == "R"){
+				//it was traveling left so stop it
+				if(this.vel.vx < 0){
+					this.vel.vx = 0
+					this.acc.ax = 0
+					//place Sam where they are supposed to go
+					this.x = clip[1];
+				}
+				//else it was traveling right so don't do anything
 			}
 		}
-		var ret = [horBlocked, vertBlocked];
-		return ret;
-	}
-
-	//it hit something verticaly
-	handleHitVertical(){
-		this.vel.vy = 5;
-	}
-
-	//it hit something verticaly
-	handleHitHorazontaly(){
-		this.vel.vx = 5;
 	}
 
 	accelerate(changeInTime){
@@ -122,10 +137,11 @@ class Sam{
 	}
 
 	jump(){
-		if(this.numFramesInFreeFall<5){
-			console.log("can");
+		//if(this.numFramesInFreeFall<5){
+		if(this.canJump){
 			this.vel.vy = normalJumpSpeed;
 			this.numFramesInFreeFall = 100;
+			this.canJump = false;
 		}
 	}
 
