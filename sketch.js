@@ -30,6 +30,9 @@ function draw() {
 	sam.draw();
 	sam.updatePos();
 	userInput();
+	if(sam.x > 990 && sam.x < 1010){
+		//sam.jump()
+	}
 }
 
 //draws all the contents of the array
@@ -53,7 +56,7 @@ function userInput(){
 	
 	if(keyIsDown(87) && !oneJump){
 		sam.jump();
-		//oneJump = true;
+		oneJump = true;
 	}else if(!keyIsDown(87)){
 		oneJump = false;
 	}
