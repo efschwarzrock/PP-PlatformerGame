@@ -36,7 +36,6 @@ class Platform{
 			//check if it's within the hitbox border
 			//check if it's on the left
 			if(x + w > this.x && x + w < this.x + hitboxBorder){
-				console.log("right");
 				return ["L", this.x-w];
 			}
 			//check if it hit the right
