@@ -20,9 +20,11 @@ function setup() {
         createCanvas(bgW, bgH);
 	sam = new Sam(30,30);
 	sam.level = level;
+	efsVar = loadImage('TransparentImg.png');
 }
 
 function draw() {
+	image(efsVar, 100, 100);
 	//console.log(sam.canJump);
     fill(color(255,255,255));
 	rect(0,0,bgW,bgH);
