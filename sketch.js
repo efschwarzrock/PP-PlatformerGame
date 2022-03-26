@@ -24,7 +24,7 @@ function setup() {
 	sam = new Sam(30,30);
 	sam.level = level;
 	console.log("here")
-	efsVar = loadImage('https://raw.githubusercontent.com/efschwarzrock/PP-PlatformerGame/main/Images/Repo/AnimationFirst.png');
+	efsVar = loadImage('https://raw.githubusercontent.com/efschwarzrock/PP-PlatformerGame/main/Images/Stand.png');
 	console.log(efsVar);
 }
 
