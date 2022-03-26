@@ -6,6 +6,7 @@ var sam;
 var oneJump = true;
 
 var efsVar = 0;
+var efsVar2 = 0;
 
 //https://makepixelart.com/
 
@@ -23,17 +24,13 @@ function setup() {
         createCanvas(bgW, bgH);
 	sam = new Sam(30,30);
 	sam.level = level;
-	console.log("here")
-	efsVar = loadImage('https://raw.githubusercontent.com/efschwarzrock/PP-PlatformerGame/main/Images/Stand.png');
-	console.log(efsVar);
+	noSmooth();
 }
 
 function draw() {
 	//draw background
     fill(color(0,255,255));
 	rect(0,0,bgW,bgH);
-
-	image(efsVar, 500, 100, 100, 100);
 	drawArr(level);
 	sam.draw();
 	sam.updatePos();

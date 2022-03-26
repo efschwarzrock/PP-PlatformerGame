@@ -11,13 +11,15 @@ var airSlowConst = 0;
 var airSlowVScale = .1;
 
 
+//image dims 7x13
+
 class Sam{
 
 	constructor(x, y) {
 		this.x = x;
 		this.y = y;
-		this.w = 20;
 		this.h = 40;
+		this.w = this.h*7/13;
 		this.vel = new Velocity();
 		this.acc = new Acceleration();
 		this.level = [];
@@ -25,15 +27,15 @@ class Sam{
 		this.numFramesInFreeFall = 0;
 		this.canJump = false;
 		this.prevV = 0;//debugging
+		this.animator = new SamAnimation();
+
+		
 	}
 
 	draw(){
-		if(Math.abs(this.prevV-this.vel.vx) < 3){
-			fill(color(0,200,0));
-		}else{
-			fill(color(255,200,200));
-		}
-		rect(this.x, this.y, this.w, this.h);
+		
+		this.animator.display(this);
+		
 	}
 
 	updatePos(){
