@@ -1,5 +1,6 @@
 var normalJumpSpeed = -600;
 var gravity = 1500;
+var wallDownGravity = 300;
 
 //var groundHorazontalAcc = 1500;
 var groundHorazontalAcc = 1500;
@@ -28,8 +29,10 @@ class Sam{
 		this.canJump = false;
 		this.prevV = 0;//debugging
 		this.animator = new SamAnimation();
+		this.wallJumpSide = 0;
+		this.wallJumpX = 0;
+		this.rezidualVel = new Velocity();
 
-		
 	}
 
 	draw(){
@@ -81,6 +84,7 @@ class Sam{
 			var clip = clips[i];
 			//on the top of a platform
 			if(clip[0] == "T"){
+				this.wallJumpSide = 0; // don't wan't to wall jump on ground
 				//it was traveling downward so stop it
 				if(this.vel.vy > 0){
 					this.vel.vy = 0
@@ -103,8 +107,10 @@ class Sam{
 				}
 				//else it was traveling downward so don't do anything
 
-				//on the left side of a platform
+				//on the left side of a platform(sam's right)
 			}else if(clip[0] == "L"){
+				//say which side sam can wall jump from, and ake sure they don't deviate from that x, so record the x
+				this.handleWallCling(1, clip[1])
 				//it was traveling right so stop it
 				if(this.vel.vx > 0){
 					this.vel.vx = 0
@@ -114,8 +120,11 @@ class Sam{
 				}
 				//else it was traveling left so don't do anything
 
-				//on the right side of the platform
+				//on the right side of the platform(sam's left)
 			}else if(clip[0] == "R"){
+				//say which side sam can wall jump from, and ake sure they don't deviate from that x, so record the x
+				this.handleWallCling(-1, clip[1])
+				
 				//it was traveling left so stop it
 				if(this.vel.vx < 0){
 					this.vel.vx = 0
@@ -128,12 +137,27 @@ class Sam{
 		}
 	}
 
+	handleWallCling(side, x){
+		//can only walljump if going down, which is positive y vel
+		if(sam.vel.vy >= 5){
+			//say which side sam can wall jump from, and ake sure they don't deviate from that x, so record the x
+			this.wallJumpSide = side;//-1 if on the right side of the platform(sam's left), 1 otherwise
+			this.wallJumpX = x;
+		}
+	}
+
 	accelerate(changeInTime){
 		var prevAccX = this.acc.ax;
 		var prevVelX = this.vel.vx;
 		this.acc.updateAx(this.vel, this.canJump);
 		this.prevV = this.vel.vx;//debugging
-		this.vel.vy += gravity*changeInTime;
+		//change gravity if we are wallClinging
+		if(this.wallJumpSide == 0){
+			//no wall cling
+			this.vel.vy += gravity*changeInTime;
+		}else{
+			this.vel.vy += wallDownGravity*changeInTime;
+		}
 		this.vel.vx += this.acc.ax*changeInTime;
 
 		//if A or D is not being pressed(only friction is acting on sam), and the velocity changes sign, 
@@ -157,6 +181,11 @@ class Sam{
 		}else{
 			this.acc.ax = -airHorazontalAcc;
 		}
+
+		//update can wall jump
+		if(this.wallJumpSide == 1){
+			this.wallJumpSide = 0
+		}
 	}
 
 	moveRight(){
@@ -164,6 +193,11 @@ class Sam{
 			this.acc.ax = groundHorazontalAcc;
 		}else{
 			this.acc.ax = airHorazontalAcc;
+		}
+
+		//update can wall jump
+		if(this.wallJumpSide == -1){
+			this.wallJumpSide = 0
 		}
 	}
 

@@ -2,13 +2,14 @@ class SamAnimation{
 	constructor(){
 		this.samImgs = [loadImage('https://raw.githubusercontent.com/efschwarzrock/PP-PlatformerGame/main/Images/Stand.png'), 
         loadImage('https://raw.githubusercontent.com/efschwarzrock/PP-PlatformerGame/main/Images/Run1.png'),
-        loadImage('https://raw.githubusercontent.com/efschwarzrock/PP-PlatformerGame/main/Images/Run2.png')];
+        loadImage('https://raw.githubusercontent.com/efschwarzrock/PP-PlatformerGame/main/Images/Run2.png'),
+		loadImage('https://raw.githubusercontent.com/efschwarzrock/PP-PlatformerGame/main/Images/WallCling.png'),];
         this.curFram = 0;
         //this.lastStillFrameX = 0;
         //this.xTillNextFrame = 20;
 		this.lastStillFrameTime = new Date().getTime();
 		this.timeTillNextFrame = 100;
-		this.direction = 1;
+		this.direction = 1;//1 is going to the right, -1 is to the left
 	}
 
     display(sam){
@@ -30,6 +31,18 @@ class SamAnimation{
 
     //logic for the animation
 	getIndexToShow(sam){
+
+		//check if sam is curently on a wall
+		if(sam.wallJumpSide != 0){
+			//double check
+			if(sam.wallJumpX == sam.x){
+				//do the wall cling frame
+				return 3;
+			}
+			//if sam is not on the x of the wall, they are no longer on the wall, thus take them off the wall
+			sam.wallJumpSide = 0;
+		}
+
 		if(sam.vel.vx == 0 || !sam.canJump){
 			this.curFrame = 0;
             this.lastStillFrameX = sam.x;
