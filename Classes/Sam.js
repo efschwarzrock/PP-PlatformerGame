@@ -1,6 +1,6 @@
 var normalJumpSpeed = -600;
 var gravity = 1500;
-var wallDownGravity = 300;
+var wallSlowV = .15;
 
 //var groundHorazontalAcc = 1500;
 var groundHorazontalAcc = 1500;
@@ -25,13 +25,12 @@ class Sam{
 		this.acc = new Acceleration();
 		this.level = [];
 		this.lastUpdate = new Date().getTime();
-		this.numFramesInFreeFall = 0;
 		this.canJump = false;
 		this.prevV = 0;//debugging
 		this.animator = new SamAnimation();
 		this.wallJumpSide = 0;
 		this.wallJumpX = 0;
-		this.rezidualVel = new Velocity();
+		this.residualVel = new ResidualVelocity();
 
 	}
 
@@ -39,6 +38,17 @@ class Sam{
 		
 		this.animator.display(this);
 		
+	}
+
+	updateSam(){
+		this.updatePos();
+		
+		//checkIf we are still wallJumping
+		if(sam.wallJumpX != sam.x){
+			sam.wallJumpSide = 0;
+		}
+		
+
 	}
 
 	updatePos(){
@@ -138,6 +148,9 @@ class Sam{
 	}
 
 	handleWallCling(side, x){
+		//store the velocity(put it all in the x direction)
+		this.residualVel.store(Math.sqrt(this.vel.vx**2 + this.vel.vy**2), 0)
+		
 		//can only walljump if going down, which is positive y vel
 		if(sam.vel.vy >= 5){
 			//say which side sam can wall jump from, and ake sure they don't deviate from that x, so record the x
@@ -147,16 +160,17 @@ class Sam{
 	}
 
 	accelerate(changeInTime){
-		var prevAccX = this.acc.ax;
+		var prevAccX = this.acc.ax;//prevent ocilation
 		var prevVelX = this.vel.vx;
-		this.acc.updateAx(this.vel, this.canJump);
+		this.acc.updateAx(this.vel, this.canJump);//get the ground resistence
 		this.prevV = this.vel.vx;//debugging
 		//change gravity if we are wallClinging
 		if(this.wallJumpSide == 0){
 			//no wall cling
 			this.vel.vy += gravity*changeInTime;
 		}else{
-			this.vel.vy += wallDownGravity*changeInTime;
+			//wall cling so add wall firction constant
+			this.vel.vy += gravity*changeInTime - this.vel.vy*wallSlowV;
 		}
 		this.vel.vx += this.acc.ax*changeInTime;
 
@@ -168,9 +182,17 @@ class Sam{
 	}
 
 	jump(){
+		//do a wall jump
+		if(this.wallJumpSide != 0){
+			         //set direction                                   //this is negative so subtract it
+			this.vel.vx = -this.wallJumpSide*(Math.abs(this.residualVel.vx) - normalJumpSpeed/12);
+			this.vel.vy = normalJumpSpeed;
+			this.wallJumpSide = 0;
+			this.canJump = false;
+		}
+		//do a normal jump
 		if(this.canJump){
 			this.vel.vy = normalJumpSpeed;
-			this.numFramesInFreeFall = 100;
 			this.canJump = false;
 		}
 	}
@@ -222,6 +244,55 @@ class Acceleration{
 		}else{
 			this.ax -= vel.vx*airSlowVScale + Math.sign(vel.vx)*airSlowConst;
 		}
+	}
+
+}
+
+var timeDelay = .5*1000;//seconds till we start decaying vel*1000
+var decayRate = 1*1000;//seconds to totaly decay, after timeDelay*1000
+
+class ResidualVelocity{
+	constructor(){
+		this.vx = 0;
+		this.vy = 0;
+		this.startTime = 0;
+		this.origVx = 0;
+		this.origVy = 0;
+	}
+
+	updateResidualVel(vel, canJump){
+		var timeDiff = new Date().getTime() - this.startTime;
+		if(timeDiff > timeDelay && this.startTime != 0){
+			//decay them based on a percentage
+			this.vx = this.origVx*(((-timeDiff+timeDelay)/decayRate) + 1);
+			this.vy = this.origVy*(((-timeDiff+timeDelay)/decayRate) + 1);
+			//totaly decayed so reset
+			if(Math.abs(this.vx) < 5 && Math.abs(this.vy) < 5){
+				this.reset();
+			}
+		}
+	}
+
+	store(x, y){
+		if(Math.abs(this.vx) < Math.abs(x)){
+			this.vx = x;
+			this.origVx = x;
+			this.startTime = new Date().getTime();
+		}
+		if(Math.abs(this.vy) < Math.abs(y)){
+			this.vy = y;
+			this.origVy = y;
+			this.startTime = new Date().getTime();
+		}
+	}
+
+	reset(){
+		console.log("here")
+		this.vx = 0;
+		this.vy = 0;
+		this.startTime = 0;
+		this.origVx = 0;
+		this.origVy = 0;
 	}
 
 }

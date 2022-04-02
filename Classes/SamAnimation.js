@@ -34,13 +34,8 @@ class SamAnimation{
 
 		//check if sam is curently on a wall
 		if(sam.wallJumpSide != 0){
-			//double check
-			if(sam.wallJumpX == sam.x){
-				//do the wall cling frame
-				return 3;
-			}
-			//if sam is not on the x of the wall, they are no longer on the wall, thus take them off the wall
-			sam.wallJumpSide = 0;
+			//do the wall cling frame
+			return 3;
 		}
 
 		if(sam.vel.vx == 0 || !sam.canJump){

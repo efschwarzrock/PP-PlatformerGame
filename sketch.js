@@ -1,5 +1,6 @@
 var level = [];
-var bgH = 580;
+var lvl = -1;
+var bgH = 700;
 var bgW = 1500;
 var sam;
 //only jump once
@@ -15,14 +16,13 @@ var efsVar2 = 0;
 var timer = 0;
 
 function setTime() {
-  console.log(sam.vel.vx);
-  console.log(sam.acc.ax, "acc");
+  console.log(sam.residualVel.vx);
 }
 
 function setup() {
-	createLevel();
-        createCanvas(bgW, bgH);
-	sam = new Sam(30,30);
+	createLevel(lvl);
+    createCanvas(bgW, bgH);
+	sam = new Sam(90,30);
 	sam.level = level;
 	noSmooth();
 }
@@ -33,11 +33,13 @@ function draw() {
 	rect(0,0,bgW,bgH);
 	drawArr(level);
 	sam.draw();
-	sam.updatePos();
+	sam.updateSam();
+	sam.residualVel.updateResidualVel();
 	userInput();
 	if(sam.x > 990 && sam.x < 1010){
 		//sam.jump()
 	}
+	
 }
 
 //draws all the contents of the array
