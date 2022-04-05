@@ -150,12 +150,11 @@ class Sam{
 	handleWallCling(side, x){
 		//store the velocity(put it all in the x direction)
 		this.residualVel.store(Math.sqrt(this.vel.vx**2 + this.vel.vy**2), 0)
-		
+		this.wallJumpX = x;
 		//can only walljump if going down, which is positive y vel
 		if(sam.vel.vy >= 5){
 			//say which side sam can wall jump from, and ake sure they don't deviate from that x, so record the x
 			this.wallJumpSide = side;//-1 if on the right side of the platform(sam's left), 1 otherwise
-			this.wallJumpX = x;
 		}
 	}
 

@@ -1,7 +1,9 @@
 var level = [];
-var lvl = -1;
+var lvl = -2;
 var bgH = 700;
 var bgW = 1500;
+var lvlW = bgW;
+var lvlH = bgH;
 var sam;
 //only jump once
 var oneJump = true;
@@ -31,6 +33,7 @@ function draw() {
 	//draw background
     fill(color(0,255,255));
 	rect(0,0,bgW,bgH);
+	moveCamera();
 	drawArr(level);
 	sam.draw();
 	sam.updateSam();
@@ -68,4 +71,36 @@ function userInput(){
 		oneJump = false;
 	}
 
+}
+
+
+var boxWidth = 300;
+var boxHeight = 150;
+var camL = bgW/2 - boxWidth/2;
+var camR = bgW/2 + boxWidth/2;
+var camU = bgH/2 - boxHeight/2;
+var camD = bgH/2 + boxHeight/2;
+var transX = 0;
+var transY = 0;
+
+function moveCamera(){
+
+	//sam it to the right of the box
+	if(sam.x > camR + transX){
+		transX = Math.min(sam.x - camR, lvlW-bgW);
+	}
+	//sam it to the left of the box
+	if(sam.x < camL + transX){
+		transX = Math.max(sam.x - camL, 0);
+		
+	}
+	//sam is to the bottom
+	if(sam.y > camD + transY){
+		transY = Math.min(sam.y - camD, lvlH-bgH);
+	}//sam is to the top
+	if(sam.y < camU + transY){
+		transY = Math.max(sam.y - camU, 0);
+	}
+
+	translate(-transX, -transY);
 }

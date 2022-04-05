@@ -4,6 +4,8 @@ function createLevel(lvl) {
 		lvlZero();
 	}else if(lvl == -1){
 		lvlNegOne();
+	}else if(lvl == -2){
+		lvlNegTwo();
 	}
 }
 
@@ -64,4 +66,41 @@ function lvlNegOne(){
 
 	//right
 	level.push(new Platform(bgW-10,0,20,bgH));
+}
+
+function lvlNegTwo(){
+	//start
+	level.push(new Platform(0,100, 400,30));
+
+	level.push(new Platform(550,0,30,900));
+
+	level.push(new Platform(150,300,480,30));
+	level.push(new Platform(0,500,400,30));
+	level.push(new Platform(150,700,480,30));
+	level.push(new Platform(0,900,400,30));
+
+	level.push(new Platform(800,940,50,50));
+	level.push(new Platform(1200,940,50,50));
+	level.push(new Platform(1600,940,50,50));
+	level.push(new Platform(2000,940,50,50));
+	level.push(new Platform(2500,540,50,450));
+	level.push(new Platform(2300,540,30,370));
+	level.push(new Platform(3200,940,50,50));
+
+	
+	//botom
+	level.push(new Platform(0,990, 4000,30));
+
+	
+	//top
+	level.push(new Platform(0,-20, 4000,30));
+
+	//left
+	level.push(new Platform(0,0,20,990));
+
+	//right
+	level.push(new Platform(3990,0,20,990));
+
+	lvlW = 4000;
+	lvlH = 1000;
 }

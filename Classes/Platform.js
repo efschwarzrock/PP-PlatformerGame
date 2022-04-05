@@ -1,4 +1,4 @@
-var hitboxBorder = 20
+var hitboxBorder = 30
 
 class Platform{
 
